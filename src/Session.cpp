@@ -56,46 +56,87 @@ Session* Session::instance() {
 void Session::onInitialized()
 {
     qDebug("Session::onInitialized");
-    m_context->setPref("extensions.logging.enabled", true);
-    m_context->setPref("extensions.strictCompatibility",false);
-    m_context->setPref("dom.experimental_forms", true);
-    m_context->setPref("xpinstall.whitelist.add", "addons.mozilla.org");
-    m_context->setPref("xpinstall.whitelist.add.180", "marketplace.firefox.com");
-    m_context->setPref("security.alternate_certificate_error_page", "certerror");
+    
+    // Infer and set Accept-Language header from the current system locale
+    QString langs;
+    QStringList locale = QLocale::system().name().split("_", QString::SkipEmptyParts);
+    if (locale.size() > 1) {
+        langs = QString("%1-%2,%3").arg(locale.at(0)).arg(locale.at(1)).arg(locale.at(0));
+    } else {
+        langs = locale.at(0);
+    }
+    m_context->setPref(QString("intl.accept_languages"), QVariant(langs));
+    
+    // these are magic numbers defining touch radius required to detect <image src=""> touch
+    m_context->setPref("browser.ui.touch.left", 32);
+    m_context->setPref("browser.ui.touch.right", 32);
+    m_context->setPref("browser.ui.touch.top", 48);
+    m_context->setPref("browser.ui.touch.bottom", 16);
+    
+    // Install embedlite handlers for guestures
     m_context->setPref("embedlite.azpc.handle.singletap", false);
     m_context->setPref("embedlite.azpc.json.singletap", true);
     m_context->setPref("embedlite.azpc.handle.longtap", false);
     m_context->setPref("embedlite.azpc.json.longtap", true);
     m_context->setPref("embedlite.azpc.json.viewport", true);
-    m_context->setPref("embedlite.select.list.async", true);
-    m_context->setPref("browser.ui.touch.left", 32);
-    m_context->setPref("browser.ui.touch.right", 32);
-    m_context->setPref("browser.ui.touch.top", 48);
-    m_context->setPref("browser.ui.touch.bottom", 16);
-    m_context->setPref("browser.ui.touch.weight.visited", 120);
-    m_context->setPref("browser.download.folderList", 2); // 0 - Desktop, 1 - Downloads, 2 - Custom
-    m_context->setPref("browser.download.useDownloadDir", false); // Invoke filepicker instead of immediate download to ~/Downloads
-    m_context->setPref("browser.download.manager.retention", 2);
-    m_context->setPref("browser.helperApps.deleteTempFileOnExit", false);
-    m_context->setPref("browser.download.manager.quitBehavior", 1);
-    m_context->setPref("keyword.enabled", true);
+    
+    // Without this pref placeholders get cleaned as soon as a character gets committed
+    // by VKB and that happens only when Enter is pressed or comma/space/dot is entered.
+    m_context->setPref(QString("dom.placeholder.show_on_focus"), QVariant(false));
+
+    m_context->setPref(QString("security.alternate_certificate_error_page"), QString("certerror"));
+    
+    // Don't use autodownload, ask
+    m_context->setPref(QString("browser.download.useDownloadDir"), QVariant(false));
+    // see https://developer.mozilla.org/en-US/docs/Download_Manager_preferences
+    // Use custom downloads location defined in browser.download.dir
+    m_context->setPref(QString("browser.download.folderList"), QVariant(2));
+    //mozContext->setPref(QString("browser.download.dir"), downloadDir());
+    // Downloads should never be removed automatically
+    m_context->setPref(QString("browser.download.manager.retention"), QVariant(2));
+    // Downloads will be canceled on quit
+    // TODO: this doesn't really work. Instead the incomplete downloads get restarted
+    //       on browser launch.
+    m_context->setPref(QString("browser.download.manager.quitBehavior"), QVariant(2));
+    // TODO: this doesn't really work too
+    m_context->setPref(QString("browser.helperApps.deleteTempFileOnExit"), QVariant(true));
+    m_context->setPref(QString("geo.wifi.scan"), QVariant(false));
+    m_context->setPref(QString("browser.enable_automatic_image_resizing"), QVariant(true));
+
+    // Make long press timeout equal to the one in Qt
+    m_context->setPref(QString("ui.click_hold_context_menus.delay"), QVariant(800));
+    m_context->setPref(QString("apz.fling_stopped_threshold"), QString("0.13f"));
+
+    // subscribe to gecko messages
+    m_context->addObservers(QStringList()
+                             << "clipboard:setdata"
+                             << "media-decoder-info"
+                             << "embed:download"
+                             << "embed:search"
+                             << "embedlite-before-first-paint");
+
+    // Enable internet search
+    m_context->setPref(QString("keyword.enabled"), QVariant(true));
+
+    // Scale up content size
+    m_context->setPixelRatio(1.5);
+
+    m_context->setPref(QString("embedlite.inputItemSize"), QVariant(38));
+    m_context->setPref(QString("embedlite.zoomMargin"), QVariant(14));
+
+    // OLD VARS
+    //m_context->setPref("extensions.logging.enabled", true);
+    //m_context->setPref("extensions.strictCompatibility",false);
+    //m_context->setPref("dom.experimental_forms", true);
+    //m_context->setPref("xpinstall.whitelist.add", "addons.mozilla.org");
+    //m_context->setPref("xpinstall.whitelist.add.180", "marketplace.firefox.com");
+    //m_context->setPref("embedlite.select.list.async", true);
+    //m_context->setPref("browser.ui.touch.weight.visited", 120);
     // Params being tested:
     //m_context->setPref("layers.progressive-paint", false);
     
-    QStringList observers;
-    observers << "embed:download" << "embed:prefs" << "embed:allprefs" << "clipboard:setdata" << "embed:logger" << "embed:search";
-    m_context->addObservers(observers);
-    
-    qDebug("Adding search plugins");
-    QVariantMap message;
-    message.insert("msg", "loadxml");
-    message.insert("uri", "chrome://embedlite/content/bing.xml");
-    message.insert("confirm", false);
-    m_context->sendObserve("embedui:search", message);
-    message["uri"] = "chrome://embedlite/content/google.xml";
-    m_context->sendObserve("embedui:search", message);
-    message["uri"] = "chrome://embedlite/content/yahoo.xml";
-    m_context->sendObserve("embedui:search", message);
-    
+    //QStringList observers;
+    //observers << "embed:download" << "embed:prefs" << "embed:allprefs" << "clipboard:setdata" << "embed:logger" << "embed:search";
+    //m_context->addObservers(observers);
 }
 
