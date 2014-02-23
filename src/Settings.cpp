@@ -56,9 +56,9 @@ void Settings::setScreenOrientation(ScreenOrientation::Orientation orientation) 
 
 void Settings::onRecvObserve(const QString message, const QVariant data)
 {
-    QVariantMap datamap = data.toMap(); // Convert the Json data to a map
+    QVariantMap dataMap = data.toMap(); // Convert the Json data to a map
     qDebug() << "==========================================================";
-    qDebug() << datamap;
+    qDebug() << dataMap;
     qDebug() << "==========================================================";
 //    abort();
     if (message == "embed:prefs")
@@ -67,13 +67,29 @@ void Settings::onRecvObserve(const QString message, const QVariant data)
     }
     else if (message == "embed:search")
     {
-        QString msg = datamap["msg"].toString();
+        QString msg = dataMap["msg"].toString();
         if (msg == "init")
         {
-            QVariant engine = datamap["defaultEngine"];
-            if (!engine.isNull())
+            if (!dataMap.value("defaultEngine").isValid()) {
+                QMozContext *mozContext = QMozContext::GetInstance();
+                QVariantMap loadsearch;
+
+                // load opensearch descriptions
+                qDebug("Adding default search plugins");
+                loadsearch.insert(QString("msg"), QVariant(QString("loadxml")));
+                loadsearch.insert(QString("uri"), QVariant(QString("chrome://embedlite/content/google.xml")));
+                loadsearch.insert(QString("confirm"), QVariant(false));
+                mozContext->sendObserve("embedui:search", QVariant(loadsearch));
+                loadsearch.insert(QString("uri"), QVariant(QString("chrome://embedlite/content/bing.xml")));
+                mozContext->sendObserve("embedui:search", QVariant(loadsearch));
+                loadsearch.insert(QString("uri"), QVariant(QString("chrome://embedlite/content/yahoo.xml")));
+                mozContext->sendObserve("embedui:search", QVariant(loadsearch));
+                
+                mSearchEngine = "Google";
+            }
+            else
             {
-                mSearchEngine = engine.toString();
+                mSearchEngine = dataMap["defaultEngine"].toString();
             }
         }
         else if (msg == "pluginslist")
