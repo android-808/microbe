@@ -31,12 +31,10 @@ protected:
     Settings* mSettings;
     
     LanguageSelector* mLanguageSelector;
-    MemoryCacheSizeSelector* mMemoryCacheSizeSelector;
-    ScreenOrientationSelector* mOrientationSelector;
-   
-    QMaemo5ValueButton* searchEngineButton;
     
-
+    QMaemo5ValueButton* memoryCacheSizeButton;
+    QMaemo5ValueButton* screenOrientationButton;
+    QMaemo5ValueButton* searchEngineButton;
 };
 
 #endif // SETTINGSDIALOG_H
