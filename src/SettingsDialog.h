@@ -5,8 +5,6 @@
 #include "Settings.h"
 
 class LanguageSelector;
-class MemoryCacheSizeSelector;
-class ScreenOrientationSelector;
 
 class QDialogButtonBox;
 class QGridLayout;
