@@ -108,7 +108,7 @@ SearchEngineModel::SearchEngineModel(QObject *parent) :
     
     QJson::Parser parser;
     bool ok;
-    QVariantMap result = parser.parse(json, &ok);
+    //QVariantMap result = parser.parse(json, &ok);
     
     //foreach (QVariant plugin, result["engines"].toList())
     //{

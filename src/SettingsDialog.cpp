@@ -1,15 +1,15 @@
 #include "SettingsDialog.h"
 
 #include "LanguageSelector.h"
-#include "MemoryCacheSizeSelector.h"
-#include "ScreenOrientationSelector.h"
 
 #include <QBoxLayout>
 #include <QDialogButtonBox>
 #include <QGridLayout>
 #include <QLabel>
+#include <QMaemo5ListPickSelector>
 #include <QMaemo5ValueButton>
 #include <QPushButton>
+#include <QStandardItemModel>
 
 #include <QDebug>
 
@@ -30,13 +30,40 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
     mLanguageSelector = new LanguageSelector(tr("Language"), true, this);
     mMainLayout->addWidget(mLanguageSelector);
     
-    mMemoryCacheSizeSelector = new MemoryCacheSizeSelector(tr("Memory cache size"), this);
-    mMainLayout->addWidget(mMemoryCacheSizeSelector);
+    QMaemo5ListPickSelector *selector;
+    QStandardItemModel *model;
     
-    mOrientationSelector = new ScreenOrientationSelector(tr("Screen orientation"), this);
-    mMainLayout->addWidget(mOrientationSelector);
+    memoryCacheSizeButton = new QMaemo5ValueButton(tr("Memory cache size"));
+    selector = new QMaemo5ListPickSelector;
+    model = new QStandardItemModel(0, 1, selector);
+    model->appendRow(new QStandardItem(tr("Automatic")));
+    model->appendRow(new QStandardItem(tr("40 MB")));
+    model->appendRow(new QStandardItem(tr("20 MB")));
+    model->appendRow(new QStandardItem(tr("10 MB")));
+    model->appendRow(new QStandardItem(tr("5 MB")));
+    model->appendRow(new QStandardItem(tr("Off")));
+    selector->setModel(model);
+    memoryCacheSizeButton->setPickSelector(selector);
+    mMainLayout->addWidget(memoryCacheSizeButton);
+
+    screenOrientationButton = new QMaemo5ValueButton(tr("Screen orientation"));
+    selector = new QMaemo5ListPickSelector;
+    model = new QStandardItemModel(0, 1, selector);
+    model->appendRow(new QStandardItem(tr("Automatic")));
+    model->appendRow(new QStandardItem(tr("Landscape")));
+    model->appendRow(new QStandardItem(tr("Portrait")));
+    selector->setModel(model);
+    screenOrientationButton->setPickSelector(selector);
+    mMainLayout->addWidget(screenOrientationButton);
     
-    searchEngineButton = new QMaemo5ValueButton("Selected search engine");
+    searchEngineButton = new QMaemo5ValueButton(tr("Selected search engine"));
+    selector = new QMaemo5ListPickSelector;
+    model = new QStandardItemModel(0, 1, selector);
+    model->appendRow(new QStandardItem(tr("Bing")));
+    model->appendRow(new QStandardItem(tr("Google")));
+    model->appendRow(new QStandardItem(tr("Yahoo")));
+    selector->setModel(model);
+    searchEngineButton->setPickSelector(selector);
     mMainLayout->addWidget(searchEngineButton);
 
     this->loadSettings();
@@ -74,8 +101,8 @@ void SettingsDialog::setPortraitLayout() {
 void SettingsDialog::loadSettings()
 {
     mLanguageSelector->setValue(mSettings->language());
-    mMemoryCacheSizeSelector->setValue(mSettings->memoryCacheSize());
-    mOrientationSelector->setValue(mSettings->screenOrientation());
+    //memoryCacheSizeButton->setValue(mSettings->memoryCacheSize());
+    //screenOrientationButton->setValue(mSettings->screenOrientation());
        
     searchEngineButton->setValueText(mSettings->searchEngine());
 }
