@@ -27,6 +27,10 @@
 
 int main(int argc, char *argv[])
 {
+    setenv("QML_BAD_GUI_RENDER_LOOP", "1", 1);
+    setenv("USE_ASYNC", "1", 1);
+    setenv("USE_TEXT_EVENTS", "1", 1);
+
 #if QT_VERSION >= 0x040800
     QApplication::setAttribute(Qt::AA_X11InitThreads, true);
 #else
