@@ -4,6 +4,7 @@
 #include <QObject>
 
 class QMozContext;
+class BookmarksModel;
 class Settings;
 //class Notifications;
 //class TransferManager;
@@ -23,6 +24,7 @@ public:
     ~Session();
     inline QNetworkAccessManager* networkAccessManager() const { return m_nam; }
     static Session* instance();
+    inline BookmarksModel* bookmarks() const { return m_bookmarks; }
 
 private Q_SLOTS:
     void onInitialized();
@@ -30,6 +32,7 @@ private Q_SLOTS:
 private:
     QNetworkConfigurationManager *m_ncm;
     QNetworkAccessManager *m_nam;
+    BookmarksModel *m_bookmarks;
     Settings *m_settings;
     QMozContext *m_context;
 //    Notifications *m_notifications;

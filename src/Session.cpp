@@ -1,5 +1,6 @@
 #include "Session.h"
 #include "qtmozembed/qmozcontext.h"
+#include "BookmarksModel.h"
 #include "Settings.h"
 //#include "notifications.h"
 //#include "transfermanager.h"
@@ -20,6 +21,7 @@ Session::Session(QObject *parent) :
     m_ncm(new QNetworkConfigurationManager(this)),
     m_nam(new QNetworkAccessManager(this)),
     m_settings(new Settings(this)),
+    m_bookmarks(new BookmarksModel(this)),
     m_context(QMozContext::GetInstance())
 //    m_notifications(new Notifications(this)),
 //    m_transferManager(new TransferManager(this)),
@@ -113,7 +115,8 @@ void Session::onInitialized()
                              << "media-decoder-info"
                              << "embed:download"
                              << "embed:search"
-                             << "embedlite-before-first-paint");
+                             << "embedlite-before-first-paint"
+                             << "embed:prefs"); // Microbe custom var
 
     // Enable internet search
     m_context->setPref(QString("keyword.enabled"), QVariant(true));
