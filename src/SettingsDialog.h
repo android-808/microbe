@@ -2,7 +2,6 @@
 #define SETTINGSDIALOG_H
 
 #include "dialogues/AbstractDialog.h"
-#include "Settings.h"
 
 class LanguageSelector;
 
@@ -21,14 +20,12 @@ public:
 private:
     void setLandscapeLayout();
     void setPortraitLayout();
-    void loadSettings();
+    void accept();
 
 protected:
     QDialogButtonBox* mButtonBox;
-    QPushButton* mSaveButton;
     QVBoxLayout* mMainLayout;
     QGridLayout* mGrid;
-    Settings* mSettings;
     
     LanguageSelector* mLanguageSelector;
     

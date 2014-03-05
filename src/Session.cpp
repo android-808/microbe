@@ -36,7 +36,6 @@ Session::Session(QObject *parent) :
 
 //    this->connect(m_transferManager, SIGNAL(alert(QString)), m_notifications, SLOT(onAlert(QString)));
 //    m_transferManager->setNetworkAccessManager(this->networkAccessManager());
-    m_settings->restoreSettings();
 //    m_transferManager->restoreStoredDownloads();
 
     if (!QMozContext::GetInstance()->initialized()) {

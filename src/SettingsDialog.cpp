@@ -1,6 +1,7 @@
 #include "SettingsDialog.h"
 
 #include "LanguageSelector.h"
+#include "Settings.h"
 
 #include <QBoxLayout>
 #include <QDialogButtonBox>
@@ -10,19 +11,18 @@
 #include <QMaemo5ValueButton>
 #include <QPushButton>
 #include <QStandardItemModel>
+#include <QSettings>
 
 #include <QDebug>
 
 SettingsDialog::SettingsDialog(QWidget *parent) :
     AbstractDialog(parent),
-    mButtonBox(new QDialogButtonBox(Qt::Vertical, this)),
-    mSaveButton(mButtonBox->addButton(tr("Save"), QDialogButtonBox::ActionRole)),
+    mButtonBox(new QDialogButtonBox(QDialogButtonBox::Save, Qt::Vertical, this)),
     mMainLayout(new QVBoxLayout()), // Not sure here
     mGrid(new QGridLayout(this))
 {
     // Window Setup
     this->setWindowTitle(tr("Settings"));
-    mSettings = Settings::instance();
 
     // Add settings
     mMainLayout->addWidget(new QLabel(tr("Browser"), this), 0, Qt::AlignHCenter);
@@ -53,9 +53,13 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
     model->appendRow(new QStandardItem(tr("Landscape")));
     model->appendRow(new QStandardItem(tr("Portrait")));
     selector->setModel(model);
+    selector->setCurrentIndex(QSettings().value("Browser/ScreenOrientation").toString() == "Automatic" ? 0 :
+                              QSettings().value("Browser/ScreenOrientation").toString() == "Landscape" ? 1 :
+                              QSettings().value("Browser/ScreenOrientation").toString() == "Portrait" ? 2 : 0);
     screenOrientationButton->setPickSelector(selector);
     mMainLayout->addWidget(screenOrientationButton);
     
+    // TODO: It is possible to add icon next to items.
     searchEngineButton = new QMaemo5ValueButton(tr("Selected search engine"));
     selector = new QMaemo5ListPickSelector;
     model = new QStandardItemModel(0, 1, selector);
@@ -63,10 +67,14 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
     model->appendRow(new QStandardItem(tr("Google")));
     model->appendRow(new QStandardItem(tr("Yahoo")));
     selector->setModel(model);
+    selector->setCurrentIndex(QSettings().value("Browser/SearchEngine").toString() == "Bing" ? 0 :
+                              QSettings().value("Browser/SearchEngine").toString() == "Google" ? 1 :
+                              QSettings().value("Browser/SearchEngine").toString() == "Yahoo" ? 2 : 1);
     searchEngineButton->setPickSelector(selector);
     mMainLayout->addWidget(searchEngineButton);
-
-    this->loadSettings();
+    
+    connect(mButtonBox, SIGNAL(accepted()), this, SLOT(accept()));
+    
     this->onOrientationChanged();
 }
 
@@ -98,11 +106,21 @@ void SettingsDialog::setPortraitLayout() {
     }
 }
 
-void SettingsDialog::loadSettings()
+void SettingsDialog::accept()
 {
-    mLanguageSelector->setValue(mSettings->language());
-    //memoryCacheSizeButton->setValue(mSettings->memoryCacheSize());
-    //screenOrientationButton->setValue(mSettings->screenOrientation());
-       
-    searchEngineButton->setValueText(mSettings->searchEngine());
+    switch (static_cast<QMaemo5ListPickSelector*>(screenOrientationButton->pickSelector())->currentIndex()) {
+        case 0: QSettings().setValue("Browser/ScreenOrientation", "Automatic"); break;
+        case 1: QSettings().setValue("Browser/ScreenOrientation", "Landscape"); break;
+        case 2: QSettings().setValue("Browser/ScreenOrientation", "Portrait"); break;
+    }
+    Settings::instance()->setScreenOrientation();
+
+    switch (static_cast<QMaemo5ListPickSelector*>(searchEngineButton->pickSelector())->currentIndex()) {
+        case 0: QSettings().setValue("Browser/SearchEngine", "Bing"); break;
+        case 1: QSettings().setValue("Browser/SearchEngine", "Google"); break;
+        case 2: QSettings().setValue("Browser/SearchEngine", "Yahoo"); break;
+    }
+    Settings::instance()->setSearchEngine();
+    
+    QDialog::accept();
 }

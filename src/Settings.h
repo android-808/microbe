@@ -2,48 +2,41 @@
 #define SETTINGS_H
 
 #include "Enums.h"
-#include <QSettings>
 #include <QStringList>
 #include <QSet>
+#include <QSettings>
 #include <qplatformdefs.h>
 #include "qtmozembed/qmozcontext.h"
 
 class QNetworkProxy;
 class QAuthenticator;
 
-class Settings : public QSettings
+class Settings : public QObject
 {
     Q_OBJECT
 
-    Q_PROPERTY(QString language
-               READ language
-               WRITE setLanguage
-               NOTIFY languageChanged)
-    Q_PROPERTY(ScreenOrientation::Orientation screenOrientation
-               READ screenOrientation
-               WRITE setScreenOrientation
-               NOTIFY screenOrientationChanged)
-
-    Q_PROPERTY(QString searchEngine READ searchEngine WRITE setSearchEngine) //NOTIFY searchEngineChanged)
-
 public:
     explicit Settings(QObject *parent = 0);
-    ~Settings();
     
-    inline signed int memoryCacheSize() const { return -1; } /*FIXME*/
     inline QString language() const { return mLanguage; }
-    inline ScreenOrientation::Orientation screenOrientation() const { return mOrientation; }
+    inline ScreenOrientation::Orientation screenOrientation() const
+    {
+        QString orientation = QSettings().value("Browser/ScreenOrientation").toString();
+        return (orientation == "Landscape" ? ScreenOrientation::LockLandscape :
+                orientation == "Portrait"  ? ScreenOrientation::LockPortrait  :
+                                             ScreenOrientation::Automatic);
+    }
+    //QString searchEngine() const {return mSearchEngine;}
+
 
     static Settings* instance();
 public Q_SLOTS:
-    void saveSettings();
-    void restoreSettings();
     void setLanguage(const QString &lang);
-    void setScreenOrientation(ScreenOrientation::Orientation orientation);
+    void setScreenOrientation();
+    void setSearchEngine();
     void onRecvObserve(const QString message, const QVariant data);
-    void setSearchEngine(const QString engine) {/*FIXME*/}
-    QString searchEngine() const {return mSearchEngine;}
-
+    
+    
 private:
 
 private Q_SLOTS:
@@ -51,14 +44,13 @@ private Q_SLOTS:
 Q_SIGNALS:
     void languageChanged(const QString &language);
     void screenOrientationChanged(ScreenOrientation::Orientation orientation);
+    void searchEngineChanged(const QString &engine);
 
 protected:
     QMozContext * MozContext;
 
 private:
     QString mLanguage;
-    ScreenOrientation::Orientation mOrientation;
-    QString mSearchEngine;
 };
 
 #endif // SETTINGS_H

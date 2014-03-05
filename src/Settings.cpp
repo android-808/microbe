@@ -2,13 +2,14 @@
 #include <QDir>
 #include <QDesktopServices>
 #include <QDebug>
+#include <QMetaEnum>
+#include <QSettings>
 
 Settings* settingsInstance = 0;
 
 Settings::Settings(QObject *parent) :
-    QSettings(QString("Microbe"), QString("Microbe"), parent),
-    mLanguage("en"),
-    mOrientation(ScreenOrientation::Automatic)
+    QObject(parent),
+    mLanguage("en")
 {
     if (!settingsInstance) {
         settingsInstance = this;
@@ -18,26 +19,8 @@ Settings::Settings(QObject *parent) :
     connect(MozContext, SIGNAL(recvObserve(QString,QVariant)), this, SLOT(onRecvObserve(QString,QVariant)));
 }
 
-Settings::~Settings() {
-    this->saveSettings();
-}
-
 Settings* Settings::instance() {
     return settingsInstance;
-}
-
-void Settings::restoreSettings() {
-    this->beginGroup("System");
-    this->setLanguage(this->value("language", QString("en")).toString());
-    this->setScreenOrientation(static_cast<ScreenOrientation::Orientation>(this->value("screenOrientation", 0).toInt()));
-    this->endGroup();
-}
-
-void Settings::saveSettings() {
-    this->beginGroup("System");
-    this->setValue("language", this->language());
-    this->setValue("screenOrientation", ScreenOrientation::Orientation(this->screenOrientation()));
-    this->endGroup();
 }
 
 void Settings::setLanguage(const QString &lang) {
@@ -47,11 +30,16 @@ void Settings::setLanguage(const QString &lang) {
     }
 }
 
-void Settings::setScreenOrientation(ScreenOrientation::Orientation orientation) {
-    if (orientation != this->screenOrientation()) {
-        mOrientation = orientation;
-        Q_EMIT screenOrientationChanged(orientation);
-    }
+void Settings::setScreenOrientation()
+{
+    Q_EMIT screenOrientationChanged(screenOrientation());
+}
+
+void Settings::setSearchEngine()
+{
+    QVariant searchEngine = QSettings().value("Browser/SearchEngine", QVariant(QString("Google")));
+    QMozContext::GetInstance()->setPref(QString("browser.search.defaultenginename"), searchEngine);
+    Q_EMIT searchEngineChanged(searchEngine.toString());
 }
 
 void Settings::onRecvObserve(const QString message, const QVariant data)
@@ -70,7 +58,8 @@ void Settings::onRecvObserve(const QString message, const QVariant data)
         QString msg = dataMap["msg"].toString();
         if (msg == "init")
         {
-            if (!dataMap.value("defaultEngine").isValid()) {
+            if (!dataMap.value("defaultEngine").isValid())
+            {
                 QMozContext *mozContext = QMozContext::GetInstance();
                 QVariantMap loadsearch;
 
@@ -84,12 +73,6 @@ void Settings::onRecvObserve(const QString message, const QVariant data)
                 mozContext->sendObserve("embedui:search", QVariant(loadsearch));
                 loadsearch.insert(QString("uri"), QVariant(QString("chrome://embedlite/content/yahoo.xml")));
                 mozContext->sendObserve("embedui:search", QVariant(loadsearch));
-                
-                mSearchEngine = "Google";
-            }
-            else
-            {
-                mSearchEngine = dataMap["defaultEngine"].toString();
             }
         }
         else if (msg == "pluginslist")
