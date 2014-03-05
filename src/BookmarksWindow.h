@@ -3,7 +3,8 @@
 
 #include "StackedWindow.h"
 
-class QAction;
+class QListView;
+class BookmarksModel;
 
 class BookmarksWindow : public StackedWindow
 {
@@ -21,6 +22,8 @@ private:
     void setPortraitLayout();
 
 private:
+    QListView* mListView;
+    BookmarksModel* mModel;
 };
 
 #endif // BOOKMARKSWINDOW_H

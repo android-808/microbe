@@ -1,4 +1,5 @@
 #include "BrowserWindow.h"
+#include "BookmarkDialog.h"
 #include "BookmarksWindow.h"
 #include "BrowserView.h"
 #include "NavigationToolBar.h"
@@ -60,8 +61,9 @@ void BrowserWindow::showAboutDialog() {
 }
 
 void BrowserWindow::showAddBookmarkDialog() {
-//    BookmarksWindow *window = new BookmarksWindow(this);
-//    window->show();
+    QGraphicsMozView* view = mBrowserView->GetMozView();
+    BookmarkDialog *dialog = new BookmarkDialog(view->url().toEncoded(), view->title(), this);
+    dialog->open();
 }
 
 

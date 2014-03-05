@@ -1,16 +1,19 @@
 #include "BookmarksWindow.h"
+#include "BookmarksModel.h"
 #include "NavigationToolBar.h"
-//#include "aboutdialog.h"
-//#include "settingsdialog.h"
-//#include "../base/windowstack.h"
+#include "Session.h"
 #include "Settings.h"
-#include <QAction>
-#include <QMenuBar>
+#include <QListView>
 
 BookmarksWindow::BookmarksWindow(QWidget *parent) :
-    StackedWindow(parent)
+    StackedWindow(parent),
+    mListView(new QListView(this)),
+    mModel(Session::instance()->bookmarks())
 {    
     this->setWindowTitle("Bookmarks");
+
+    this->setCentralWidget(mListView);
+    mListView->setModel(mModel);
 
     this->onOrientationChanged();
 }
