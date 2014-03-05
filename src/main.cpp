@@ -31,6 +31,10 @@ int main(int argc, char *argv[])
     setenv("USE_ASYNC", "1", 1);
     setenv("USE_TEXT_EVENTS", "1", 1);
 
+    // Workaround for https://bugzilla.mozilla.org/show_bug.cgi?id=929879
+    setenv("LC_NUMERIC", "C", 1);
+    setlocale(LC_NUMERIC, "C");
+
 #if QT_VERSION >= 0x040800
     QApplication::setAttribute(Qt::AA_X11InitThreads, true);
 #else
@@ -38,9 +42,11 @@ int main(int argc, char *argv[])
     QApplication::setAttribute(static_cast<Qt::ApplicationAttribute>(10), true);
 #endif
 
+    QApplication::setOrganizationName("Microbe");
+    QApplication::setApplicationName("Microbe");
+    QApplication::setApplicationVersion(Utils::versionNumberString());
+
     QApplication app(argc, argv);
-    app.setApplicationName("Microbe");
-    app.setApplicationVersion(Utils::versionNumberString());
     app.setQuitOnLastWindowClosed(true);
 
     new Session;
