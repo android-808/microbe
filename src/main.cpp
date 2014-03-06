@@ -1,7 +1,7 @@
 #include "BrowserWindow.h"
+#include "DBusAdaptor.h"
 #include "Session.h"
 #include "Settings.h"
-#include "Utils.h"
 #include "WindowCreator.h"
 #include <QApplication>
 #include <QDBusConnection>
@@ -10,13 +10,6 @@
 #include <QTimer>
 #include <QTranslator>
 #include "qtmozembed/qmozcontext.h"
-#include "mozilla/embedlite/EmbedLiteApp.h"
-
-#include <QGraphicsView>
-#include <QGraphicsScene>
-#include "DBusAdaptor.h"
-#include "qtmozembed/qgraphicsmozview.h"
-#include <QGLWidget>
 
 #if defined(Q_WS_X11) && QT_VERSION < 0x040800
 #include <X11/Xlib.h>
@@ -44,7 +37,7 @@ int main(int argc, char *argv[])
 
     QApplication::setOrganizationName("Microbe");
     QApplication::setApplicationName("Microbe");
-    QApplication::setApplicationVersion(Utils::versionNumberString());
+    QApplication::setApplicationVersion("0.1");
 
     QApplication app(argc, argv);
     app.setQuitOnLastWindowClosed(true);
