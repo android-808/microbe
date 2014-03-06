@@ -3,8 +3,6 @@
 
 #include "dialogues/AbstractDialog.h"
 
-class LanguageSelector;
-
 class QDialogButtonBox;
 class QGridLayout;
 class QPushButton;
@@ -27,9 +25,7 @@ protected:
     QVBoxLayout* mMainLayout;
     QGridLayout* mGrid;
     
-    LanguageSelector* mLanguageSelector;
-    
-    QMaemo5ValueButton* memoryCacheSizeButton;
+    //QMaemo5ValueButton* memoryCacheSizeButton;
     QMaemo5ValueButton* screenOrientationButton;
     QMaemo5ValueButton* searchEngineButton;
 };

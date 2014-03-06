@@ -1,6 +1,4 @@
 #include "SettingsDialog.h"
-
-#include "LanguageSelector.h"
 #include "Settings.h"
 
 #include <QBoxLayout>
@@ -27,13 +25,10 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
     // Add settings
     mMainLayout->addWidget(new QLabel(tr("Browser"), this), 0, Qt::AlignHCenter);
     
-    mLanguageSelector = new LanguageSelector(tr("Language"), true, this);
-    mMainLayout->addWidget(mLanguageSelector);
-    
     QMaemo5ListPickSelector *selector;
     QStandardItemModel *model;
     
-    memoryCacheSizeButton = new QMaemo5ValueButton(tr("Memory cache size"));
+    /*memoryCacheSizeButton = new QMaemo5ValueButton(tr("Memory cache size"));
     selector = new QMaemo5ListPickSelector;
     model = new QStandardItemModel(0, 1, selector);
     model->appendRow(new QStandardItem(tr("Automatic")));
@@ -44,7 +39,7 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
     model->appendRow(new QStandardItem(tr("Off")));
     selector->setModel(model);
     memoryCacheSizeButton->setPickSelector(selector);
-    mMainLayout->addWidget(memoryCacheSizeButton);
+    mMainLayout->addWidget(memoryCacheSizeButton);*/
 
     screenOrientationButton = new QMaemo5ValueButton(tr("Screen orientation"));
     selector = new QMaemo5ListPickSelector;
