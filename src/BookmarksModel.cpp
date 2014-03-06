@@ -14,8 +14,6 @@ BookmarksModel::BookmarksModel(QObject *parent) :
     QString settingsLocation = QDesktopServices::storageLocation(QDesktopServices::DataLocation) + "/bookmarks.json";
     QScopedPointer<QFile> file(new QFile(settingsLocation));
 
-    qDebug() << "Bookmark path: " + settingsLocation;
-
     if (!file->open(QIODevice::ReadOnly | QIODevice::Text)) {
         qDebug() << "Unable to open bookmarks " + settingsLocation;
 
@@ -40,7 +38,6 @@ BookmarksModel::BookmarksModel(QObject *parent) :
                                        map["favicon"].toString());
             bookmarks.insert(url, m);
             bookmarkUrls.append(url);
-            qDebug() << "Url:" << url;
         }
     }
     else
