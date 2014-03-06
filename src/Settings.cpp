@@ -8,7 +8,8 @@
 Settings* settingsInstance = 0;
 
 Settings::Settings(QObject *parent) :
-    QObject(parent)
+    QObject(parent),
+    mOrientation(ScreenOrientation::Automatic)
 {
     if (!settingsInstance) {
         settingsInstance = this;
@@ -22,13 +23,14 @@ Settings* Settings::instance() {
     return settingsInstance;
 }
 
-void Settings::setScreenOrientation()
+void Settings::reload()
 {
-    Q_EMIT screenOrientationChanged(screenOrientation());
-}
+    QString orientation = QSettings().value("Browser/ScreenOrientation").toString();
+    mOrientation = (orientation == "Landscape" ? ScreenOrientation::LockLandscape :
+                    orientation == "Portrait"  ? ScreenOrientation::LockPortrait  :
+                                                 ScreenOrientation::Automatic);
+    Q_EMIT screenOrientationChanged(mOrientation);
 
-void Settings::setSearchEngine()
-{
     QVariant searchEngine = QSettings().value("Browser/SearchEngine", QVariant(QString("Google")));
     QMozContext::GetInstance()->setPref(QString("browser.search.defaultenginename"), searchEngine);
     Q_EMIT searchEngineChanged(searchEngine.toString());

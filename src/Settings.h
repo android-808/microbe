@@ -18,20 +18,13 @@ class Settings : public QObject
 public:
     explicit Settings(QObject *parent = 0);
     
-    inline ScreenOrientation::Orientation screenOrientation() const
-    {
-        QString orientation = QSettings().value("Browser/ScreenOrientation").toString();
-        return (orientation == "Landscape" ? ScreenOrientation::LockLandscape :
-                orientation == "Portrait"  ? ScreenOrientation::LockPortrait  :
-                                             ScreenOrientation::Automatic);
-    }
+    inline ScreenOrientation::Orientation screenOrientation() const { return mOrientation; }
     //QString searchEngine() const {return mSearchEngine;}
 
 
     static Settings* instance();
 public Q_SLOTS:
-    void setScreenOrientation();
-    void setSearchEngine();
+    void reload();
     void onRecvObserve(const QString message, const QVariant data);
     
     
@@ -44,6 +37,7 @@ Q_SIGNALS:
     void searchEngineChanged(const QString &engine);
 
 protected:
+    ScreenOrientation::Orientation mOrientation;
     QMozContext * MozContext;
 
 private:

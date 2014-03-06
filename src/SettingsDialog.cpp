@@ -108,14 +108,14 @@ void SettingsDialog::accept()
         case 1: QSettings().setValue("Browser/ScreenOrientation", "Landscape"); break;
         case 2: QSettings().setValue("Browser/ScreenOrientation", "Portrait"); break;
     }
-    Settings::instance()->setScreenOrientation();
-
+    
     switch (static_cast<QMaemo5ListPickSelector*>(searchEngineButton->pickSelector())->currentIndex()) {
         case 0: QSettings().setValue("Browser/SearchEngine", "Bing"); break;
         case 1: QSettings().setValue("Browser/SearchEngine", "Google"); break;
         case 2: QSettings().setValue("Browser/SearchEngine", "Yahoo"); break;
     }
-    Settings::instance()->setSearchEngine();
+    
+    Settings::instance()->reload();
     
     QDialog::accept();
 }
