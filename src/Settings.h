@@ -18,7 +18,6 @@ class Settings : public QObject
 public:
     explicit Settings(QObject *parent = 0);
     
-    inline QString language() const { return mLanguage; }
     inline ScreenOrientation::Orientation screenOrientation() const
     {
         QString orientation = QSettings().value("Browser/ScreenOrientation").toString();
@@ -31,7 +30,6 @@ public:
 
     static Settings* instance();
 public Q_SLOTS:
-    void setLanguage(const QString &lang);
     void setScreenOrientation();
     void setSearchEngine();
     void onRecvObserve(const QString message, const QVariant data);
@@ -42,7 +40,6 @@ private:
 private Q_SLOTS:
 
 Q_SIGNALS:
-    void languageChanged(const QString &language);
     void screenOrientationChanged(ScreenOrientation::Orientation orientation);
     void searchEngineChanged(const QString &engine);
 
@@ -50,7 +47,6 @@ protected:
     QMozContext * MozContext;
 
 private:
-    QString mLanguage;
 };
 
 #endif // SETTINGS_H

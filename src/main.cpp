@@ -43,12 +43,10 @@ int main(int argc, char *argv[])
     app.setQuitOnLastWindowClosed(true);
 
     new Session;
-
-    if (!Settings::instance()->language().isEmpty()) {
-        QTranslator translator;
-        translator.load(QString("/opt/microbe/translations/microbe_%1").arg(Settings::instance()->language()));
+    
+    QTranslator translator;
+    if(translator.load(QString("/opt/microbe/translations/microbe_%1").arg(QLocale::system().name())))
         app.installTranslator(&translator);
-    }
  
     QString urlstring("about:blank");
 

@@ -8,8 +8,7 @@
 Settings* settingsInstance = 0;
 
 Settings::Settings(QObject *parent) :
-    QObject(parent),
-    mLanguage("en")
+    QObject(parent)
 {
     if (!settingsInstance) {
         settingsInstance = this;
@@ -21,13 +20,6 @@ Settings::Settings(QObject *parent) :
 
 Settings* Settings::instance() {
     return settingsInstance;
-}
-
-void Settings::setLanguage(const QString &lang) {
-    if (lang != this->language()) {
-        mLanguage = lang;
-        Q_EMIT languageChanged(lang);
-    }
 }
 
 void Settings::setScreenOrientation()
